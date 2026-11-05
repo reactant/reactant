@@ -89,9 +89,12 @@ export const render: LegacyRender = ((
     return ReactDom.render(element, container, callback);
   }
   const rootContainer = container as RootContainer;
-  const root =
-    roots.get(rootContainer) ??
-    createConcurrentRoot(container as Element | DocumentFragment);
+  let root = roots.get(rootContainer);
+  if (!root) {
+    root = invokeClientEntryPoint(() =>
+      createConcurrentRoot(container as Element | DocumentFragment)
+    );
+  }
   roots.set(rootContainer, root);
   renderWithCallback(() => {
     root.render(element as ReactNode);
